@@ -8,7 +8,7 @@ exports.handler = async (event, context) => {
 
   try {
     const newPost = JSON.parse(event.body)
-    const filePath = path.join(process.cwd(), 'data', 'posts.json')
+    const filePath = path.join(process.cwd(), '/tmp', 'posts.json')
 
     // Read existing posts
     let posts = { posts: [] }

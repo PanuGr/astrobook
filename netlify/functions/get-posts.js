@@ -3,7 +3,7 @@ const path = require('path');
 
 exports.handler = async (event, context) => {
   try {
-    const filePath = path.join(process.cwd(), 'data', 'posts.json')
+    const filePath = path.join(process.cwd(), '/temp', 'posts.json')
 
     let posts = { posts: [] }
     try {
