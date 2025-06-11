@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
     posts.posts.unshift(newPost)
 
     // Ensure data directory exists
-    await fs.mkdir(path.dirname(filePath), { recursive: true })
+    //await fs.mkdir(path.dirname(filePath), { recursive: true })
 
     // Write back to file
     await fs.writeFile(filePath, JSON.stringify(posts, null, 2))
