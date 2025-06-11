@@ -9,15 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.50.0",
+    "astro": "^5.9.2",
+    "tailwindcss": "^4.1.9",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.10",
-    "accessible-astro-components": "^1.6.6",
-    "astro": "^5.9.2",
-    "astro-icon": "^0.7.3",
-    "tailwindcss": "^4.1.9"
-  },
-  "devDependencies": {
-    "sass": "^1.89.2"
+    "@supabase/supabase-js": "^2.50.0"
   }
 }
