@@ -1,10 +1,10 @@
-const fs = require('fs').promises
-const path = require('path')
+const fs = require('fs').promises;
+const path = require('path');
 
 exports.handler = async (event, context) => {
   try {
     const filePath = path.join(process.cwd(), 'data', 'posts.json')
-    
+
     let posts = { posts: [] }
     try {
       const data = await fs.readFile(filePath, 'utf8')

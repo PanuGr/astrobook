@@ -1,5 +1,5 @@
-const fs = require('fs').promises
-const path = require('path')
+const fs = require('fs').promises;
+const path = require('path');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -9,7 +9,7 @@ exports.handler = async (event, context) => {
   try {
     const newPost = JSON.parse(event.body)
     const filePath = path.join(process.cwd(), 'data', 'posts.json')
-    
+
     // Read existing posts
     let posts = { posts: [] }
     try {
@@ -24,7 +24,7 @@ exports.handler = async (event, context) => {
 
     // Ensure data directory exists
     await fs.mkdir(path.dirname(filePath), { recursive: true })
-    
+
     // Write back to file
     await fs.writeFile(filePath, JSON.stringify(posts, null, 2))
 
