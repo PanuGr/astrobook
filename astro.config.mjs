@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://frbook.netlify.app",
+  site: "https://astroobook.netlify.app",
   prefetch: true,
   vite: {
     plugins: [tailwindcss()]
