@@ -1,0 +1,18 @@
+---
+const { user } = Astro.props;
+---
+
+<nav class="bg-blue-600 text-white p-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold">FriendsBook</h1>
+        <div class="flex items-center space-x-4">
+            <span>Welcome, {user.email}</span>
+            <button
+                id="logout-btn"
+                class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded"
+            >
+                Logout
+            </button>
+        </div>
+    </div>
+</nav>

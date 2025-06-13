@@ -1,0 +1,14 @@
+---
+const { user } = Astro.props;
+---
+
+<!-- Left Sidebar -->
+<div class="lg:col-span-1">
+    <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="font-semibold mb-3">My Profile</h3>
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+            <span>{user.email}</span>
+        </div>
+    </div>
+</div>
