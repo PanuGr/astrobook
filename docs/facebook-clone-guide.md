@@ -4,13 +4,31 @@
 
 ### 1. Initialize Astro Project
 ```bash
-npm create astro@latest
+npm create astro@latest friendsbook
+cd friendsbook
 npm install
 npm install @tailwindcss/typography
+npx tailwindcss init -p
 ```
 
 ### 2. Configure Tailwind
-See Astro documentation
+Edit `tailwind.config.mjs`:
+```js
+export default {
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+Add to `src/styles/global.css`:
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
 ### 3. Setup Supabase
 ```bash
@@ -175,16 +193,119 @@ const { title } = Astro.props
 
 ## Phase 4: Main Feed Page
 
-### 9. Home Page
+### 9. Create Astro Components
+
+Create `src/components/Navigation.astro`:
+```astro
+---
+const { user } = Astro.props
+---
+
+<nav class="bg-blue-600 text-white p-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <h1 class="text-xl font-bold">FriendsBook</h1>
+    <div class="flex items-center space-x-4">
+      <span>Welcome, {user.email}</span>
+      <button id="logout-btn" class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded">
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+```
+
+Create `src/components/PostInput.astro`:
+```astro
+<div class="bg-white rounded-lg shadow p-4 mb-6">
+  <textarea
+    id="post-content"
+    placeholder="What's on your mind?"
+    class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+    rows="3"
+  ></textarea>
+  <button
+    id="post-btn"
+    class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+  >
+    Post
+  </button>
+</div>
+```
+
+Create `src/components/PostCard.astro`:
+```astro
+---
+const { post } = Astro.props
+---
+
+<div class="bg-white rounded-lg shadow p-4 mb-4">
+  <div class="flex items-center space-x-3 mb-3">
+    <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+    <div>
+      <h4 class="font-semibold">{post.username}</h4>
+      <p class="text-gray-500 text-sm">{new Date(post.created_at).toLocaleString()}</p>
+    </div>
+  </div>
+  <p class="mb-3">{post.content}</p>
+  <div class="flex space-x-4 text-gray-500">
+    <button class="hover:text-blue-600">👍 Like ({post.likes})</button>
+    <button class="hover:text-blue-600">💬 Comment ({post.comments})</button>
+  </div>
+</div>
+```
+
+Create `src/components/Sidebar.astro`:
+```astro
+---
+const { user } = Astro.props
+---
+
+<!-- Left Sidebar -->
+<div class="lg:col-span-1">
+  <div class="bg-white rounded-lg shadow p-4">
+    <h3 class="font-semibold mb-3">My Profile</h3>
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+      <span>{user.email}</span>
+    </div>
+  </div>
+</div>
+```
+
+### 10. Updated Home Page
 Create `src/pages/index.astro`:
 ```astro
 ---
 import Layout from '../layouts/Layout.astro'
+import Navigation from '../components/Navigation.astro'
+import PostInput from '../components/PostInput.astro'
+import PostCard from '../components/PostCard.astro'
+import Sidebar from '../components/Sidebar.astro'
 ---
 
 <Layout title="FriendsBook">
   <div id="app">
-    <!-- Will be populated by JavaScript -->
+    <div class="min-h-screen bg-gray-100" style="display: none;">
+      <div id="main-content"></div>
+      
+      <div class="container mx-auto mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div id="sidebar-container"></div>
+        
+        <!-- Main Feed -->
+        <div class="lg:col-span-2">
+          <div id="post-input-container"></div>
+          <div id="posts-container"></div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3">Upcoming Events</h3>
+            <p class="text-gray-500">No events yet</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -199,75 +320,59 @@ import Layout from '../layouts/Layout.astro'
         return
       }
       
-      // User is authenticated, load the main app
       loadMainApp(user)
     }
 
     function loadMainApp(user) {
-      document.getElementById('app').innerHTML = `
-        <div class="min-h-screen bg-gray-100">
-          <!-- Navigation -->
-          <nav class="bg-blue-600 text-white p-4">
-            <div class="container mx-auto flex justify-between items-center">
-              <h1 class="text-xl font-bold">FriendsBook</h1>
-              <div class="flex items-center space-x-4">
-                <span>Welcome, ${user.email}</span>
-                <button id="logout-btn" class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded">
-                  Logout
-                </button>
-              </div>
+      // Show the main app
+      document.querySelector('.min-h-screen').style.display = 'block'
+      
+      // Load navigation
+      document.getElementById('main-content').innerHTML = `
+        <nav class="bg-blue-600 text-white p-4">
+          <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">FriendsBook</h1>
+            <div class="flex items-center space-x-4">
+              <span>Welcome, ${user.email}</span>
+              <button id="logout-btn" class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded">
+                Logout
+              </button>
             </div>
-          </nav>
-
-          <!-- Main Content -->
-          <div class="container mx-auto mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Left Sidebar -->
-            <div class="lg:col-span-1">
-              <div class="bg-white rounded-lg shadow p-4">
-                <h3 class="font-semibold mb-3">My Profile</h3>
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
-                  <span>${user.email}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Main Feed -->
-            <div class="lg:col-span-2">
-              <!-- Post Creation -->
-              <div class="bg-white rounded-lg shadow p-4 mb-6">
-                <textarea
-                  id="post-content"
-                  placeholder="What's on your mind?"
-                  class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="3"
-                ></textarea>
-                <button
-                  id="post-btn"
-                  class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                >
-                  Post
-                </button>
-              </div>
-
-              <!-- Posts Feed -->
-              <div id="posts-container">
-                <!-- Posts will be loaded here -->
-              </div>
-            </div>
-
-            <!-- Right Sidebar -->
-            <div class="lg:col-span-1">
-              <div class="bg-white rounded-lg shadow p-4">
-                <h3 class="font-semibold mb-3">Upcoming Events</h3>
-                <p class="text-gray-500">No events yet</p>
-              </div>
+          </div>
+        </nav>
+      `
+      
+      // Load sidebar
+      document.getElementById('sidebar-container').innerHTML = `
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-4">
+            <h3 class="font-semibold mb-3">My Profile</h3>
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+              <span>${user.email}</span>
             </div>
           </div>
         </div>
       `
+      
+      // Load post input
+      document.getElementById('post-input-container').innerHTML = `
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+          <textarea
+            id="post-content"
+            placeholder="What's on your mind?"
+            class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="3"
+          ></textarea>
+          <button
+            id="post-btn"
+            class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+          >
+            Post
+          </button>
+        </div>
+      `
 
-      // Add event listeners
       setupEventListeners(user)
       loadPosts()
     }
@@ -290,47 +395,51 @@ import Layout from '../layouts/Layout.astro'
       })
     }
 
+    // Replace createPost function with:
     async function createPost(user, content) {
-      const post = {
-        id: Date.now().toString(),
-        userId: user.id,
-        username: user.email.split('@')[0],
-        content: content,
-        timestamp: new Date().toISOString(),
-        likes: [],
-        comments: []
-      }
-
-      // Send to serverless function
       try {
-        await fetch('/.netlify/functions/create-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(post)
-        })
+        const { data, error } = await supabase
+          .from('posts')
+          .insert([
+            {
+              user_id: user.id,
+              username: user.email.split('@')[0],
+              content: content,
+              likes: 0,
+              comments: 0
+            }
+          ])
+
+        if (error) throw error
       } catch (error) {
         console.error('Error creating post:', error)
+        alert('Error creating post')
       }
     }
 
+    // Replace loadPosts function with:
     async function loadPosts() {
       try {
-        const response = await fetch('/.netlify/functions/get-posts')
-        const data = await response.json()
+        const { data: posts, error } = await supabase
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
         
-        const postsHtml = data.posts.map(post => `
+        const postsHtml = posts.map(post => `
           <div class="bg-white rounded-lg shadow p-4 mb-4">
             <div class="flex items-center space-x-3 mb-3">
               <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
               <div>
                 <h4 class="font-semibold">${post.username}</h4>
-                <p class="text-gray-500 text-sm">${new Date(post.timestamp).toLocaleString()}</p>
+                <p class="text-gray-500 text-sm">${new Date(post.created_at).toLocaleString()}</p>
               </div>
             </div>
             <p class="mb-3">${post.content}</p>
             <div class="flex space-x-4 text-gray-500">
-              <button class="hover:text-blue-600">👍 Like (${post.likes.length})</button>
-              <button class="hover:text-blue-600">💬 Comment (${post.comments.length})</button>
+              <button class="hover:text-blue-600">👍 Like (${post.likes})</button>
+              <button class="hover:text-blue-600">💬 Comment (${post.comments})</button>
             </div>
           </div>
         `).join('')
@@ -347,89 +456,89 @@ import Layout from '../layouts/Layout.astro'
 </Layout>
 ```
 
-## Phase 5: Serverless Functions
+## Phase 5: Supabase Database Setup
 
-### 10. Create Posts Function
-Create `netlify/functions/create-post.js`:
-```js
-const fs = require('fs').promises
-const path = require('path')
+### 10. Create Database Table
+In your Supabase dashboard, go to SQL Editor and run:
+```sql
+CREATE TABLE posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  likes INTEGER DEFAULT 0,
+  comments INTEGER DEFAULT 0
+);
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' }
-  }
+-- Enable Row Level Security
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
-  try {
-    const newPost = JSON.parse(event.body)
-    const filePath = path.join(process.cwd(), 'data', 'posts.json')
-    
-    // Read existing posts
-    let posts = { posts: [] }
-    try {
-      const data = await fs.readFile(filePath, 'utf8')
-      posts = JSON.parse(data)
-    } catch (error) {
-      // File doesn't exist, use empty array
-    }
+-- Policy: Users can read all posts
+CREATE POLICY "Posts are viewable by everyone" ON posts
+  FOR SELECT USING (true);
 
-    // Add new post
-    posts.posts.unshift(newPost)
-
-    // Ensure data directory exists
-    await fs.mkdir(path.dirname(filePath), { recursive: true })
-    
-    // Write back to file
-    await fs.writeFile(filePath, JSON.stringify(posts, null, 2))
-
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({ success: true })
-    }
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    }
-  }
-}
+-- Policy: Users can insert their own posts
+CREATE POLICY "Users can insert their own posts" ON posts
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 ```
 
-### 11. Get Posts Function
-Create `netlify/functions/get-posts.js`:
+### 11. Update Frontend - Remove Serverless Functions
+Replace the post creation and loading functions in `src/pages/index.astro`:
+
 ```js
-const fs = require('fs').promises
-const path = require('path')
-
-exports.handler = async (event, context) => {
+// Replace createPost function with:
+async function createPost(user, content) {
   try {
-    const filePath = path.join(process.cwd(), 'data', 'posts.json')
-    
-    let posts = { posts: [] }
-    try {
-      const data = await fs.readFile(filePath, 'utf8')
-      posts = JSON.parse(data)
-    } catch (error) {
-      // File doesn't exist, return empty array
-    }
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([
+        {
+          user_id: user.id,
+          username: user.email.split('@')[0],
+          content: content,
+          likes: 0,
+          comments: 0
+        }
+      ])
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify(posts)
-    }
+    if (error) throw error
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    }
+    console.error('Error creating post:', error)
+    alert('Error creating post')
+  }
+}
+
+// Replace loadPosts function with:
+async function loadPosts() {
+  try {
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    
+    const postsHtml = posts.map(post => `
+      <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <div class="flex items-center space-x-3 mb-3">
+          <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+          <div>
+            <h4 class="font-semibold">${post.username}</h4>
+            <p class="text-gray-500 text-sm">${new Date(post.created_at).toLocaleString()}</p>
+          </div>
+        </div>
+        <p class="mb-3">${post.content}</p>
+        <div class="flex space-x-4 text-gray-500">
+          <button class="hover:text-blue-600">👍 Like (${post.likes})</button>
+          <button class="hover:text-blue-600">💬 Comment (${post.comments})</button>
+        </div>
+      </div>
+    `).join('')
+    
+    document.getElementById('posts-container').innerHTML = postsHtml
+  } catch (error) {
+    console.error('Error loading posts:', error)
   }
 }
 ```
