@@ -14,70 +14,7 @@ async function checkAuth() {
 }
 
 function loadMainApp(user) {
-  document.getElementById("app").innerHTML = `
-  <div class="min-h-screen bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-blue-600 text-white p-4">
-      <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-xl font-bold">FriendsBook</h1>
-        <div class="flex items-center space-x-4">
-          <span>Welcome, ${user.email}</span>
-          <button id="logout-btn" class="bg-blue-700 hover:bg-blue-800 px-3 py-1 rounded">
-            Logout
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mx-auto mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <!-- Left Sidebar -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow p-4">
-          <h3 class="font-semibold mb-3">My Profile</h3>
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
-            <span>${user.email}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Feed -->
-      <div class="lg:col-span-2">
-        <!-- Post Creation -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
-          <textarea
-            id="post-content"
-            placeholder="What's on your mind?"
-            class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
-          ></textarea>
-          <button
-            id="post-btn"
-            class="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-          >
-            Post
-          </button>
-        </div>
-
-        <!-- Posts Feed -->
-        <div id="posts-container">
-          <!-- Posts will be loaded here -->
-        </div>
-      </div>
-
-      <!-- Right Sidebar -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow p-4">
-          <h3 class="font-semibold mb-3">Upcoming Events</h3>
-          <p class="text-gray-500">No events yet</p>
-        </div>
-      </div>
-    </div>
-  </div>
-`;
-
-  // Add event listeners
+    // Add event listeners
   setupEventListeners(user);
   loadPosts();
 }
