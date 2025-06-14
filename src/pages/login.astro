@@ -67,6 +67,7 @@ import Head from "../componenets/Head.astro";
           if (error) {
             alert("Error: " + error.message);
           } else {
+            cookieStore.set("User", data.user.id);
             window.location.href = "/";
           }
         });
@@ -83,6 +84,7 @@ import Head from "../componenets/Head.astro";
           if (error) {
             alert("Error: " + error.message);
           } else {
+            cookieStore.set("User", data.user.id);
             window.location.href = "/";
           }
         });
